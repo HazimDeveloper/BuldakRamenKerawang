@@ -368,9 +368,135 @@
                 margin-top: 1rem;
             }
         }
+
+        .food-options {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f8f8;
+            border-radius: 10px;
+        }
+
+        .option-group {
+            margin-bottom: 1rem;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .quantity-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #ff3333;
+        }
+
+        .quantity-display {
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff4d4d;
+            margin: 1rem 0;
+        }
+
+        .cart-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff4d4d, #ff6b6b);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            cursor: pointer;
+        }
+
+        .cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
+        }
+
+        .cart-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .location-input {
+        margin: 1rem 0;
+    }
+
+    .location-input input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    .location-input input:focus {
+        border-color: #ff4d4d;
+        box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
+    }
     </style>
-</head>
-<body>
+</head><body>
     <header class="header">
         <div class="header-content">
             <h1>Buldak Ramen UITM KT</h1>
@@ -383,23 +509,129 @@
             <div class="product-card">
                 <img src="images/carbonara.png" alt="Buldak Carbonara" class="product-image">
                 <h2>Buldak Carbonara</h2>
-                <div class="price">
-                    <p>Dalam Packaging: RM6</p>
-                    <p>Dah Masak: RM7</p>
-                    <p>Dengan Telur: RM8</p>
+                <div class="food-options">
+                    <div class="option-group">
+                        <label>Pilih Jenis:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-type" value="packaging" data-price="6" checked>
+                                Packaging (RM6)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-type" value="masak" data-price="7">
+                                Dah Masak (RM7)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-type" value="telur" data-price="8">
+                                Dengan Telur (RM8)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Pilih Kaedah Pembayaran:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-payment" value="cash" checked>
+                                Tunai
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-payment" value="transfer">
+                                Transfer Bank
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Pilih Kaedah Penghantaran:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-delivery" value="delivery" checked onclick="checkDeliveryType('carbonara', 'delivery')">
+                                Penghantaran
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="carbonara-delivery" value="pickup" onclick="checkDeliveryType('carbonara', 'pickup')">
+                                Ambil Sendiri (K240)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="location-input" id="carbonara-location" style="display: none;">
+                        <input type="text" placeholder="Masukkan No. Bilik" id="carbonara-room">
+                    </div>
+
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus" onclick="updateQuantity('carbonara', -1)">-</button>
+                        <span class="quantity-display" id="carbonara-quantity">1</span>
+                        <button class="quantity-btn plus" onclick="updateQuantity('carbonara', 1)">+</button>
+                    </div>
+                    <div class="total-price" id="carbonara-total">Total: RM6</div>
+                    <button class="cart-btn" onclick="processOrder('carbonara')">Order Sekarang</button>
                 </div>
-                <a href="https://wa.link/sqjot9" class="cta-button">Order Sekarang</a>
             </div>
 
             <div class="product-card">
                 <img src="images/original.png" alt="Buldak Original" class="product-image">
                 <h2>Buldak Original</h2>
-                <div class="price">
-                    <p>Dalam Packaging: RM5</p>
-                    <p>Dah Masak: RM6</p>
-                    <p>Dengan Telur: RM7</p>
+                <div class="food-options">
+                    <div class="option-group">
+                        <label>Pilih Jenis:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="original-type" value="packaging" data-price="5" checked>
+                                Packaging (RM5)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="original-type" value="masak" data-price="6">
+                                Dah Masak (RM6)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="original-type" value="telur" data-price="7">
+                                Dengan Telur (RM7)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Pilih Kaedah Pembayaran:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="original-payment" value="cash" checked>
+                                Tunai
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="original-payment" value="transfer">
+                                Transfer Bank
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Pilih Kaedah Penghantaran:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="original-delivery" value="delivery" onclick="showLocationInput('original')" >
+                                Penghantaran
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="original-delivery" value="pickup" onclick="hideLocationInput('original')">
+                                Ambil Sendiri (K240)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="location-input" id="original-location" style="display: none;">
+                        <input type="text" placeholder="Masukkan No. Bilik" id="original-room">
+                    </div>
+
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus" onclick="updateQuantity('original', -1)">-</button>
+                        <span class="quantity-display" id="original-quantity">1</span>
+                        <button class="quantity-btn plus" onclick="updateQuantity('original', 1)">+</button>
+                    </div>
+                    <div class="total-price" id="original-total">Total: RM5</div>
+                    <button class="cart-btn" onclick="processOrder('original')">Order Sekarang</button>
                 </div>
-                <a href="https://wa.link/sqjot9" class="cta-button">Order Sekarang</a>
             </div>
         </div>
 
@@ -464,5 +696,98 @@
     <a href="https://wa.link/sqjot9" class="floating-whatsapp">
         <i class="fab fa-whatsapp"></i>
     </a>
+
+    <script>
+
+function checkDeliveryType(product, type) {
+            const locationInput = document.getElementById(`${product}-location`);
+            if (type === 'pickup') {
+                locationInput.style.display = 'none';
+                document.getElementById(`${product}-room`).value = '';
+            } else {
+                locationInput.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const deliveryTypes = document.querySelectorAll('input[name$="-delivery"]');
+            deliveryTypes.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const product = this.name.split('-')[0];
+                    checkDeliveryType(product, this.value);
+                });
+
+                // Set initial state
+                if (radio.checked) {
+                    const product = radio.name.split('-')[0];
+                    checkDeliveryType(product, radio.value);
+                }
+            });
+        });
+            function showLocationInput(product) {
+            const locationInput = document.getElementById(`${product}-location`);
+            locationInput.style.display = 'block';
+        }
+
+        function hideLocationInput(product) {
+            console.log('product')
+            const locationInput = document.getElementById(`${product}-location`);
+            locationInput.style.display = 'none';
+            document.getElementById(`${product}-room`).value = '';
+        }
+
+        function updateQuantity(product, change) {
+            const quantityElement = document.getElementById(`${product}-quantity`);
+            let quantity = parseInt(quantityElement.textContent);
+            quantity = Math.max(1, quantity + change);
+            quantityElement.textContent = quantity;
+            updateTotal(product);
+        }
+
+        function updateTotal(product) {
+            const quantity = parseInt(document.getElementById(`${product}-quantity`).textContent);
+            const selectedType = document.querySelector(`input[name="${product}-type"]:checked`);
+            const price = parseFloat(selectedType.dataset.price);
+            const total = (price * quantity).toFixed(2);
+            document.getElementById(`${product}-total`).textContent = `Total: RM${total}`;
+        }
+
+        function processOrder(product) {
+            const quantity = document.getElementById(`${product}-quantity`).textContent;
+            const type = document.querySelector(`input[name="${product}-type"]:checked`).value;
+            const payment = document.querySelector(`input[name="${product}-payment"]:checked`).value;
+            const delivery = document.querySelector(`input[name="${product}-delivery"]:checked`).value;
+            const total = document.getElementById(`${product}-total`).textContent;
+            
+            let locationInfo = '';
+            if (delivery === 'pickup') {
+                const roomNumber = document.getElementById(`${product}-room`).value;
+                if (!roomNumber) {
+                    alert('Sila masukkan nombor bilik!');
+                    return;
+                }
+                locationInfo = `\nNo. Bilik: ${roomNumber}`;
+            }
+
+            const numPhone = "601169591087";
+            const message = encodeURIComponent(`Saya nak order:
+${product.charAt(0).toUpperCase() + product.slice(1)}
+Jenis: ${type}
+Kuantiti: ${quantity}
+${total}
+Kaedah Pembayaran: ${payment === 'cash' ? 'Tunai' : 'Transfer Bank'}
+Kaedah Penghantaran: ${delivery === 'delivery' ? 'Penghantaran' : 'Ambil Sendiri'}${locationInfo}`);
+            
+            window.open(`https://wa.me/${numPhone}?text=${message}`, '_blank');
+        }
+
+        // Add event listeners for delivery type changes
+        document.querySelectorAll('input[name$="-delivery"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const product = radio.name.split('-')[0];
+                showLocationInput(product);
+            });
+        });
+    </script>
 </body>
 </html>

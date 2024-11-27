@@ -698,96 +698,105 @@
     </a>
 
     <script>
+// Add event listeners for type changes
+document.addEventListener('DOMContentLoaded', function() {
+    // Add change event listeners for all type radio buttons
+    const typeRadios = document.querySelectorAll('input[name$="-type"]');
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const product = this.name.split('-')[0];
+            updateTotal(product);
+        });
+    });
+
+    // Add change event listeners for all delivery type radio buttons
+    const deliveryTypes = document.querySelectorAll('input[name$="-delivery"]');
+    deliveryTypes.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const product = this.name.split('-')[0];
+            checkDeliveryType(product, this.value);
+        });
+
+        // Set initial state
+        if (radio.checked) {
+            const product = radio.name.split('-')[0];
+            checkDeliveryType(product, radio.value);
+        }
+    });
+});
 
 function checkDeliveryType(product, type) {
-            const locationInput = document.getElementById(`${product}-location`);
-            if (type === 'pickup') {
-                locationInput.style.display = 'none';
-                document.getElementById(`${product}-room`).value = '';
-            } else {
-                locationInput.style.display = 'block';
-            }
+    const locationInput = document.getElementById(`${product}-location`);
+    if (type === 'pickup') {
+        locationInput.style.display = 'none';
+        document.getElementById(`${product}-room`).value = '';
+    } else {
+        locationInput.style.display = 'block';
+    }
+}
+
+function showLocationInput(product) {
+    const locationInput = document.getElementById(`${product}-location`);
+    locationInput.style.display = 'block';
+}
+
+function hideLocationInput(product) {
+    const locationInput = document.getElementById(`${product}-location`);
+    locationInput.style.display = 'none';
+    document.getElementById(`${product}-room`).value = '';
+}
+
+function updateQuantity(product, change) {
+    const quantityElement = document.getElementById(`${product}-quantity`);
+    let quantity = parseInt(quantityElement.textContent);
+    quantity = Math.max(1, quantity + change);
+    quantityElement.textContent = quantity;
+    updateTotal(product);
+}
+
+function updateTotal(product) {
+    const quantity = parseInt(document.getElementById(`${product}-quantity`).textContent);
+    const selectedType = document.querySelector(`input[name="${product}-type"]:checked`);
+    const price = parseFloat(selectedType.dataset.price);
+    const total = (price * quantity).toFixed(2);
+    document.getElementById(`${product}-total`).textContent = `Total: RM${total}`;
+}
+
+function processOrder(product) {
+    const quantity = document.getElementById(`${product}-quantity`).textContent;
+    const type = document.querySelector(`input[name="${product}-type"]:checked`).value;
+    const payment = document.querySelector(`input[name="${product}-payment"]:checked`).value;
+    const delivery = document.querySelector(`input[name="${product}-delivery"]:checked`).value;
+    const total = document.getElementById(`${product}-total`).textContent;
+    const roomNumber = document.getElementById(`${product}-room`).value;
+    let locationInfo = '';
+
+    if (delivery === 'delivery' && !roomNumber) {
+        alert('Sila masukkan nombor bilik!');
+        return;
+    }
+    if (delivery === 'delivery') {
+        const roomNumber = document.getElementById(`${product}-room`).value;
+        if (!roomNumber) {
+            alert('Sila masukkan nombor bilik!');
+            return;
         }
+        locationInfo = `\nNo. Bilik: ${roomNumber}`;
+    }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const deliveryTypes = document.querySelectorAll('input[name$="-delivery"]');
-            deliveryTypes.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const product = this.name.split('-')[0];
-                    checkDeliveryType(product, this.value);
-                });
-
-                // Set initial state
-                if (radio.checked) {
-                    const product = radio.name.split('-')[0];
-                    checkDeliveryType(product, radio.value);
-                }
-            });
-        });
-            function showLocationInput(product) {
-            const locationInput = document.getElementById(`${product}-location`);
-            locationInput.style.display = 'block';
-        }
-
-        function hideLocationInput(product) {
-            console.log('product')
-            const locationInput = document.getElementById(`${product}-location`);
-            locationInput.style.display = 'none';
-            document.getElementById(`${product}-room`).value = '';
-        }
-
-        function updateQuantity(product, change) {
-            const quantityElement = document.getElementById(`${product}-quantity`);
-            let quantity = parseInt(quantityElement.textContent);
-            quantity = Math.max(1, quantity + change);
-            quantityElement.textContent = quantity;
-            updateTotal(product);
-        }
-
-        function updateTotal(product) {
-            const quantity = parseInt(document.getElementById(`${product}-quantity`).textContent);
-            const selectedType = document.querySelector(`input[name="${product}-type"]:checked`);
-            const price = parseFloat(selectedType.dataset.price);
-            const total = (price * quantity).toFixed(2);
-            document.getElementById(`${product}-total`).textContent = `Total: RM${total}`;
-        }
-
-        function processOrder(product) {
-            const quantity = document.getElementById(`${product}-quantity`).textContent;
-            const type = document.querySelector(`input[name="${product}-type"]:checked`).value;
-            const payment = document.querySelector(`input[name="${product}-payment"]:checked`).value;
-            const delivery = document.querySelector(`input[name="${product}-delivery"]:checked`).value;
-            const total = document.getElementById(`${product}-total`).textContent;
-            
-            let locationInfo = '';
-            if (delivery === 'pickup') {
-                const roomNumber = document.getElementById(`${product}-room`).value;
-                if (!roomNumber) {
-                    alert('Sila masukkan nombor bilik!');
-                    return;
-                }
-                locationInfo = `\nNo. Bilik: ${roomNumber}`;
-            }
-
-            const numPhone = "601169591087";
-            const message = encodeURIComponent(`Saya nak order:
+    const numPhone = "601169591087";
+    const message = encodeURIComponent(`Saya nak order:
 ${product.charAt(0).toUpperCase() + product.slice(1)}
 Jenis: ${type}
 Kuantiti: ${quantity}
 ${total}
 Kaedah Pembayaran: ${payment === 'cash' ? 'Tunai' : 'Transfer Bank'}
-Kaedah Penghantaran: ${delivery === 'delivery' ? 'Penghantaran' : 'Ambil Sendiri'}${locationInfo}`);
-            
-            window.open(`https://wa.me/${numPhone}?text=${message}`, '_blank');
-        }
-
-        // Add event listeners for delivery type changes
-        document.querySelectorAll('input[name$="-delivery"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                const product = radio.name.split('-')[0];
-                showLocationInput(product);
-            });
-        });
+Kaedah Penghantaran: ${delivery === 'delivery' ? 'Penghantaran' : 'Ambil Sendiri'}${locationInfo}
+No. Bilik: ${roomNumber || 'K240'}`
+);
+    
+    window.open(`https://wa.me/${numPhone}?text=${message}`, '_blank');
+}
     </script>
 </body>
 </html>

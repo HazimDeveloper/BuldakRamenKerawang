@@ -77,6 +77,7 @@ class OrderManagement {
             formData.append('data', JSON.stringify(order));
     
             const response = await fetch(this.GOOGLE_SCRIPT_URL, {
+                mode: 'no-cors',
                 method: 'POST',
                 body: formData
             });

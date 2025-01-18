@@ -130,6 +130,9 @@
     <div class="buttons">
         <button class="btn btn-print" onclick="window.print()">Print Receipt</button>
         <button class="btn btn-complete" onclick="completeOrder()">Complete Order</button>
+        <button class="btn btn-back" onclick="window.location.href='index.html'" style="background: #666; color: white;">
+            Back to Menu
+        </button>
     </div>
 
     <script>
@@ -168,15 +171,41 @@
         }
 
         // Complete order and close window
-        function completeOrder() {
-            const order = getOrderData();
-            if (order && window.opener && window.opener.completeOrder) {
-                window.opener.completeOrder(order.orderId);
-                window.close();
-            } else {
-                window.close();
+// Update the completeOrder function in receipt.html
+function completeOrder() {
+    const order = getOrderData();
+    if (order) {
+        // Save completion to localStorage
+        const orders = JSON.parse(localStorage.getItem('buldakOrders') || '[]');
+        const updatedOrders = orders.map(o => {
+            if (o.orderId === order.orderId) {
+                return { ...o, status: 'completed' };
             }
-        }
+            return o;
+        });
+        localStorage.setItem('buldakOrders', JSON.stringify(updatedOrders));
+        
+        // Notify admin via WhatsApp
+        const adminPhone = "601169591087";
+        const message = encodeURIComponent(`
+🆕 New Order Received!
+
+Order ID: ${order.orderId}
+Product: ${order.product}
+Type: ${order.type}
+Quantity: ${order.quantity}
+${order.total}
+Payment: ${order.payment}
+Delivery: ${order.delivery}
+Room: ${order.roomNumber}
+Time: ${new Date().toLocaleString()}`);
+
+        window.open(`https://wa.me/${adminPhone}?text=${message}`, '_blank');
+
+        // Redirect back to main page
+        window.location.href = 'index.html';
+    }
+}
 
         // Initialize receipt
         window.onload = function() {

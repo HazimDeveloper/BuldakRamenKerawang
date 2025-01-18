@@ -136,16 +136,11 @@ class OrderManagement {
     }
 
     showReceipt(order) {
-        return new Promise((resolve) => {
-            // Convert order data to URL-safe string
-            const orderData = encodeURIComponent(JSON.stringify(order));
-            
-            // Open receipt in new window/tab
-            const receiptWindow = window.open(`../receipt.html?data=${orderData}`, 'Receipt', 
-                'width=400,height=600,scrollbars=yes,resizable=yes');
-            
-            resolve(receiptWindow);
-        });
+        // Convert order data to URL-safe string
+        const orderData = encodeURIComponent(JSON.stringify(order));
+        
+        // Redirect to receipt page
+        window.location.href = `receipt.html?data=${orderData}`;
     }
 
     notifyAdmin(order) {

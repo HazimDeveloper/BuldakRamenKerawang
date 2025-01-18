@@ -141,7 +141,7 @@ class OrderManagement {
             const orderData = encodeURIComponent(JSON.stringify(order));
             
             // Open receipt in new window/tab
-            const receiptWindow = window.open(`receipt.html?data=${orderData}`, 'Receipt', 
+            const receiptWindow = window.open(`../receipt.html?data=${orderData}`, 'Receipt', 
                 'width=400,height=600,scrollbars=yes,resizable=yes');
             
             resolve(receiptWindow);

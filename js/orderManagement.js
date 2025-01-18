@@ -2,7 +2,7 @@ class OrderManagement {
     constructor() {
         this.orders = JSON.parse(localStorage.getItem('buldakOrders')) || [];
         this.adminPhone = "601169591087";
-        this.GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhCeBbByFOT7SBqG4_FuHhpXEahqbq3Z_HH0Nt2NX52xnTV2Aq82kLGXmt_v_niWqP/exec';
+        this.GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4u_T5jzYk2L2r6Gyjgx8BQDDARgSkcdo-TLYrQ8bNSYTwqsWDKSzCEBJdEGwVLn1bKA/exec';
         this.initializeEventListeners();
     }
 
@@ -67,30 +67,31 @@ class OrderManagement {
             ...orderData
         };
     
-        console.log('Preparing to save order:', order); // Debug log
-    
         try {
-            // Save to Google Sheets
-            console.log('Sending request to Google Sheets...'); // Debug log
-            
-            const formData = new FormData();
+            console.log('Preparing to save order:', order);
+    
+            // Create URLSearchParams object
+            const formData = new URLSearchParams();
             formData.append('data', JSON.stringify(order));
     
-            const response = await fetch(this.GOOGLE_SCRIPT_URL, {
+            // First try to save to Google Sheets
+            await fetch(this.GOOGLE_SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(order)), {
                 method: 'POST',
-                body: formData,
                 mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
             });
     
-            console.log('Response from Google Sheets:', response); // Debug log
+            console.log('Order sent to Google Sheets');
     
-            // Save locally
+            // Save locally as backup
             this.orders.push(order);
             localStorage.setItem('buldakOrders', JSON.stringify(this.orders));
     
             return order;
         } catch (error) {
-            console.error('Error saving order:', error); // Error log
+            console.error('Error saving order:', error);
             // Still save locally if Google Sheets fails
             this.orders.push(order);
             localStorage.setItem('buldakOrders', JSON.stringify(this.orders));
@@ -136,44 +137,13 @@ class OrderManagement {
 
     showReceipt(order) {
         return new Promise((resolve) => {
-            const receiptWindow = window.open('', 'Receipt', 'width=400,height=600');
-            receiptWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Order Receipt - ${order.orderId}</title>
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    </head>
-                    <body style="background: #f5f5f5; margin: 0; padding: 20px;">
-                        ${this.generateReceiptHTML(order)}
-                        <div style="text-align: center; margin-top: 20px;">
-                            <button onclick="window.print()" style="
-                                background: #ff4d4d;
-                                color: white;
-                                border: none;
-                                padding: 10px 20px;
-                                border-radius: 5px;
-                                cursor: pointer;
-                                margin-right: 10px;
-                            ">Print Receipt</button>
-                            <button onclick="completeOrderAndClose('${order.orderId}')" style="
-                                background: #4CAF50;
-                                color: white;
-                                border: none;
-                                padding: 10px 20px;
-                                border-radius: 5px;
-                                cursor: pointer;
-                            ">Complete Order</button>
-                        </div>
-                        <script>
-                            function completeOrderAndClose(orderId) {
-                                window.opener.completeOrder(orderId);
-                                window.close();
-                            }
-                        </script>
-                    </body>
-                </html>
-            `);
-            receiptWindow.document.close();
+            // Convert order data to URL-safe string
+            const orderData = encodeURIComponent(JSON.stringify(order));
+            
+            // Open receipt in new window/tab
+            const receiptWindow = window.open(`receipt.html?data=${orderData}`, 'Receipt', 
+                'width=400,height=600,scrollbars=yes,resizable=yes');
+            
             resolve(receiptWindow);
         });
     }
@@ -238,7 +208,6 @@ Time: ${new Date().toLocaleString()}`);
         } catch (error) {
             console.error('Error processing order:', error);
             alert('Warning: Order saved locally but might not have synced with our system. Please save your receipt.');
-
         } finally {
             // Reset button state
             orderButton.innerText = 'Order Sekarang';
@@ -249,11 +218,6 @@ Time: ${new Date().toLocaleString()}`);
     completeOrder(orderId) {
         const order = this.orders.find(o => o.orderId === orderId);
         if (order) {
-            // Update order status locally
-            order.status = 'completed';
-            localStorage.setItem('buldakOrders', JSON.stringify(this.orders));
-            
-            // Notify admin
             this.notifyAdmin(order);
         }
     }

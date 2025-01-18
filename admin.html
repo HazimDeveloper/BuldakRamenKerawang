@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buldak Ramen Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Buldak Ramen Admin Dashboard</h1>
+
+        <!-- File Upload -->
+        <div class="mb-4">
+            <input type="file" id="csvFile" accept=".csv" class="mb-2">
+            <button onclick="loadCSV()" class="bg-blue-500 text-white px-4 py-2 rounded">Load Orders</button>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="mb-4 flex gap-4">
+            <select id="statusFilter" class="border p-2 rounded">
+                <option value="all">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+            </select>
+            <input type="date" id="dateFilter" class="border p-2 rounded">
+        </div>
+
+        <!-- Orders Table -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left">Timestamp</th>
+                        <th class="px-6 py-3 text-left">Order ID</th>
+                        <th class="px-6 py-3 text-left">Product</th>
+                        <th class="px-6 py-3 text-left">Type</th>
+                        <th class="px-6 py-3 text-left">Quantity</th>
+                        <th class="px-6 py-3 text-left">Total</th>
+                        <th class="px-6 py-3 text-left">Payment</th>
+                        <th class="px-6 py-3 text-left">Delivery</th>
+                        <th class="px-6 py-3 text-left">Room</th>
+                        <th class="px-6 py-3 text-left">Status</th>
+                        <th class="px-6 py-3 text-left">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let orders = [];
+
+        function loadCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const csvData = event.target.result;
+                    parseCSV(csvData);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function parseCSV(csvData) {
+            const lines = csvData.split('\n');
+            const headers = lines[0].split(',');
+            orders = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = lines[i].split(',');
+                const order = {};
+                headers.forEach((header, index) => {
+                    order[header.trim()] = values[index].trim();
+                });
+                orders.push(order);
+            }
+
+            displayOrders(orders);
+        }
+
+        function displayOrders(ordersToDisplay) {
+            const tableBody = document.getElementById('ordersTable');
+            tableBody.innerHTML = '';
+
+            ordersToDisplay.forEach(order => {
+                const row = document.createElement('tr');
+                row.className = 'border-t';
+                row.innerHTML = `
+                    <td class="px-6 py-4">${order['Timestamp']}</td>
+                    <td class="px-6 py-4">${order['Order ID']}</td>
+                    <td class="px-6 py-4">${order['Product']}</td>
+                    <td class="px-6 py-4">${order['Type']}</td>
+                    <td class="px-6 py-4">${order['Quantity']}</td>
+                    <td class="px-6 py-4">${order['Total']}</td>
+                    <td class="px-6 py-4">${order['Payment']}</td>
+                    <td class="px-6 py-4">${order['Delivery']}</td>
+                    <td class="px-6 py-4">${order['Room Number']}</td>
+                    <td class="px-6 py-4">${order['Status']}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="updateStatus('${order['Order ID']}')" 
+                                class="bg-green-500 text-white px-2 py-1 rounded">
+                            Complete
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateStatus(orderId) {
+            const order = orders.find(o => o['Order ID'] === orderId);
+            if (order) {
+                order['Status'] = 'Completed';
+                displayOrders(orders);
+                // Export updated orders to CSV
+                exportToCSV(orders);
+            }
+        }
+
+        function exportToCSV(ordersData) {
+            const headers = ['Timestamp', 'Order ID', 'Product', 'Type', 'Quantity', 'Total', 
+                           'Payment', 'Delivery', 'Room Number', 'Status'];
+            
+            const csvRows = [headers];
+            ordersData.forEach(order => {
+                const row = headers.map(header => order[header]);
+                csvRows.push(row);
+            });
+
+            const csvContent = csvRows.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'updated_orders.csv';
+            link.click();
+        }
+
+        // Event listeners for filters
+        document.getElementById('statusFilter').addEventListener('change', filterOrders);
+        document.getElementById('dateFilter').addEventListener('change', filterOrders);
+
+        function filterOrders() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filteredOrders = orders;
+
+            if (statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => order['Status'] === statusFilter);
+            }
+
+            if (dateFilter) {
+                const filterDate = new Date(dateFilter).toLocaleDateString();
+                filteredOrders = filteredOrders.filter(order => {
+                    const orderDate = new Date(order['Timestamp']).toLocaleDateString();
+                    return orderDate === filterDate;
+                });
+            }
+
+            displayOrders(filteredOrders);
+        }
+    </script>
+</body>
+</html>

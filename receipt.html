@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .receipt {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header h1 {
+            color: #ff4d4d;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .divider {
+            border: 1px dashed #ccc;
+            margin: 10px 0;
+        }
+
+        .receipt-details {
+            margin: 15px 0;
+        }
+
+        .receipt-details p {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .receipt-details strong {
+            margin-right: 10px;
+        }
+
+        .total {
+            text-align: right;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-print {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .btn-complete {
+            background: #4CAF50;
+            color: white;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .receipt {
+                box-shadow: none;
+            }
+
+            .buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt" id="receipt">
+        <!-- Receipt content will be injected here -->
+    </div>
+
+    <div class="buttons">
+        <button class="btn btn-print" onclick="window.print()">Print Receipt</button>
+        <button class="btn btn-complete" onclick="completeOrder()">Complete Order</button>
+    </div>
+
+    <script>
+        // Get order data from URL parameters
+        function getOrderData() {
+            const params = new URLSearchParams(window.location.search);
+            const orderData = params.get('data');
+            return orderData ? JSON.parse(decodeURIComponent(orderData)) : null;
+        }
+
+        // Generate receipt HTML
+        function generateReceipt(order) {
+            return `
+                <div class="receipt-header">
+                    <h1>Buldak Ramen UITM KT</h1>
+                    <p>Order ID: ${order.orderId}</p>
+                    <p>${new Date().toLocaleString()}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="receipt-details">
+                    <p><strong>Product</strong> <span>${order.product}</span></p>
+                    <p><strong>Type</strong> <span>${order.type}</span></p>
+                    <p><strong>Quantity</strong> <span>${order.quantity}</span></p>
+                    <p><strong>Payment Method</strong> <span>${order.payment}</span></p>
+                    <p><strong>Delivery Method</strong> <span>${order.delivery}</span></p>
+                    <p><strong>Room Number</strong> <span>${order.roomNumber}</span></p>
+                </div>
+                <div class="divider"></div>
+                <div class="total">
+                    <p>${order.total}</p>
+                </div>
+                <div class="receipt-footer">
+                    <p>Thank you for your order!</p>
+                    <p>Please screenshot this receipt.</p>
+                </div>`;
+        }
+
+        // Complete order and close window
+        function completeOrder() {
+            const order = getOrderData();
+            if (order && window.opener && window.opener.completeOrder) {
+                window.opener.completeOrder(order.orderId);
+                window.close();
+            } else {
+                window.close();
+            }
+        }
+
+        // Initialize receipt
+        window.onload = function() {
+            const order = getOrderData();
+            if (order) {
+                document.getElementById('receipt').innerHTML = generateReceipt(order);
+            } else {
+                document.getElementById('receipt').innerHTML = '<p>No order data found.</p>';
+            }
+        };
+    </script>
+</body>
+</html>

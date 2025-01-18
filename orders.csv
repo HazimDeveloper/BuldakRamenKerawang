@@ -1,0 +1,18 @@
+Timestamp,Order ID,Product,Type,Quantity,Total,Payment,Delivery,Room Number,Status
+2025-01-18T07:14:34.771Z,,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:14:48.323Z,,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:15:08.861Z,,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:19:17.398Z,ORD757398,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:21:42.558Z,ORD902558,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:22:04.474Z,ORD924474,Original,packaging,2,Total: RM10.00,Tunai,Penghantaran,231,pending
+2025-01-18T07:23:06.570Z,ORD986570,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:24:25.967Z,ORD065967,Carbonara,packaging,2,Total: RM12.00,Tunai,Penghantaran,K241,pending
+2025-01-18T07:27:05.288Z,ORD225288,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:28:45.288Z,ORD325288,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:32:55.417Z,ORD575417,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,pending
+2025-01-18T07:40:04.091Z,ORD004091,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,completed
+2025-01-18T07:41:20.649Z,ORD080649,Original,packaging,2,Total: RM10.00,Tunai,Penghantaran,K250,completed
+2025-01-18T07:43:56.831Z,ORD236831,Carbonara,packaging,1,Total: RM6,Tunai,Ambil Sendiri,K240,completed
+2025-01-18T07:45:08.719Z,ORD308719,Carbonara,packaging,1,Total: RM6,Tunai,Ambil Sendiri,K240,completed
+2025-01-18T07:47:50.250Z,ORD470250,Carbonara,packaging,2,Total: RM12.00,Tunai,Ambil Sendiri,K240,completed
+1/18/2025, 4:02:30 PM,ORD350177,Carbonara,packaging,1,Total: RM6,Tunai,Penghantaran,K241,Pending

@@ -77,9 +77,9 @@ class OrderManagement {
             formData.append('data', JSON.stringify(order));
     
             const response = await fetch(this.GOOGLE_SCRIPT_URL, {
-                mode: 'no-cors',
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: 'no-cors',
             });
     
             console.log('Response from Google Sheets:', response); // Debug log

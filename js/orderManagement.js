@@ -51,9 +51,20 @@ class OrderManagement {
     updateTotal(product) {
         const quantity = parseInt(document.getElementById(`${product}-quantity`).textContent);
         const selectedType = document.querySelector(`input[name="${product}-type"]:checked`);
-        const price = parseFloat(selectedType.dataset.price);
-        const total = (price * quantity).toFixed(2);
+        const selectedDelivery = document.querySelector(`input[name="${product}-delivery"]:checked`);
+        
+        let basePrice = parseFloat(selectedType.dataset.price);
+        let deliveryFee = selectedDelivery.value === 'delivery-sutera' ? 1 : 0;
+        let totalPrice = (basePrice + deliveryFee) * quantity;
+        
+        const total = totalPrice.toFixed(2);
         document.getElementById(`${product}-total`).textContent = `Total: RM${total}`;
+        return {
+            basePrice,
+            deliveryFee,
+            totalPrice,
+            total: `RM${total}`
+        };
     }
 
     generateOrderId() {
@@ -164,47 +175,56 @@ Time: ${new Date().toLocaleString()}`);
         const orderButton = document.querySelector(`button[onclick="orderManager.processOrder('${product}')"]`);
         
         try {
-            // Show loading state
             orderButton.innerText = 'Processing...';
             orderButton.disabled = true;
-
+    
             const quantity = document.getElementById(`${product}-quantity`).textContent;
             const type = document.querySelector(`input[name="${product}-type"]:checked`).value;
             const payment = document.querySelector(`input[name="${product}-payment"]:checked`).value;
             const delivery = document.querySelector(`input[name="${product}-delivery"]:checked`).value;
-            const total = document.getElementById(`${product}-total`).textContent;
             const roomNumber = document.getElementById(`${product}-room`).value;
-
-            if (delivery === 'delivery' && !roomNumber) {
+    
+            // Calculate prices including delivery fee
+            const priceDetails = this.updateTotal(product);
+    
+            if (delivery.includes('delivery') && !roomNumber) {
                 alert('Sila masukkan nombor bilik!');
                 orderButton.innerText = 'Order Sekarang';
                 orderButton.disabled = false;
                 return;
             }
-
+    
+            const deliveryText = {
+                'delivery-kasa': 'Penghantaran Kolej Kasa',
+                'delivery-sutera': 'Penghantaran Kolej Sutera (+RM1)',
+                'pickup': 'Ambil Sendiri'
+            };
+    
             const orderData = {
                 product: product.charAt(0).toUpperCase() + product.slice(1),
                 type,
                 quantity,
-                total,
+                basePrice: priceDetails.basePrice,
+                deliveryFee: priceDetails.deliveryFee,
+                total: priceDetails.total,
                 payment: payment === 'cash' ? 'Tunai' : 'Transfer Bank',
-                delivery: delivery === 'delivery' ? 'Penghantaran' : 'Ambil Sendiri',
+                delivery: deliveryText[delivery],
                 roomNumber: roomNumber || 'K240'
             };
-
+    
             const savedOrder = await this.saveOrder(orderData);
             await this.showReceipt(savedOrder);
-
+            this.notifyAdmin(savedOrder);
+    
             // Reset form
             document.getElementById(`${product}-quantity`).textContent = '1';
             document.getElementById(`${product}-room`).value = '';
             this.updateTotal(product);
-
+    
         } catch (error) {
             console.error('Error processing order:', error);
             alert('Warning: Order saved locally but might not have synced with our system. Please save your receipt.');
         } finally {
-            // Reset button state
             orderButton.innerText = 'Order Sekarang';
             orderButton.disabled = false;
         }

@@ -1,176 +1,338 @@
 <!DOCTYPE html>
 <html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Buldak Ramen UITM KT</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
     <header class="header">
-        <div class="header-content">
-            <h1>Buldak Ramen UITM KT</h1>
-            <p>Nikmati Kelazatan Buldak Ramen di Kolej Kerawang!</p>
-        </div>
+      <div class="header-content">
+        <h1>Buldak Ramen UITM KT</h1>
+        <p>Nikmati Kelazatan Buldak Ramen di Kolej Kerawang!</p>
+      </div>
     </header>
 
     <div class="container">
-        <div class="product-grid">
-            <!-- Carbonara Product Card -->
-            <div class="product-card">
-                <img src="images/carbonara.png" alt="Buldak Carbonara" class="product-image">
-                <h2>Buldak Carbonara</h2>
-                <div class="food-options">
-                    <div class="option-group">
-                        <label>Pilih Jenis:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-type" value="packaging" data-price="6" checked>
-                                Packaging (RM6)
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-type" value="masak" data-price="7">
-                                Dah Masak (RM7)
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-type" value="telur" data-price="8">
-                                Dengan Telur (RM8)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-group">
-                        <label>Pilih Kaedah Pembayaran:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-payment" value="cash" checked>
-                                Tunai
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-payment" value="transfer">
-                                Transfer Bank
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-group">
-                        <label>Pilih Kaedah Penghantaran:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-delivery" value="delivery" checked>
-                                Penghantaran
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="carbonara-delivery" value="pickup">
-                                Ambil Sendiri (K240)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="location-input" id="carbonara-location">
-                        <input type="text" placeholder="Masukkan No. Bilik" id="carbonara-room">
-                    </div>
-
-                    <div class="quantity-control">
-                        <button class="quantity-btn minus" onclick="orderManager.updateQuantity('carbonara', -1)">-</button>
-                        <span class="quantity-display" id="carbonara-quantity">1</span>
-                        <button class="quantity-btn plus" onclick="orderManager.updateQuantity('carbonara', 1)">+</button>
-                    </div>
-                    <div class="total-price" id="carbonara-total">Total: RM6</div>
-                    <button class="cart-btn" onclick="orderManager.processOrder('carbonara')">Order Sekarang</button>
-                </div>
+      <div class="product-grid">
+        <!-- Carbonara Product Card -->
+        <div class="product-card">
+          <img
+            src="images/carbonara.png"
+            alt="Buldak Carbonara"
+            class="product-image"
+          />
+          <h2>Buldak Carbonara</h2>
+          <div class="food-options">
+            <div class="option-group">
+              <label>Pilih Jenis:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-type"
+                    value="packaging"
+                    data-price="6"
+                    checked
+                  />
+                  Packaging (RM6)
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-type"
+                    value="masak"
+                    data-price="7"
+                  />
+                  Dah Masak (RM7)
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-type"
+                    value="telur"
+                    data-price="8"
+                  />
+                  Dengan Telur (RM8)
+                </label>
+              </div>
             </div>
 
-            <!-- Original Product Card -->
-            <div class="product-card">
-                <img src="images/original.png" alt="Buldak Original" class="product-image">
-                <h2>Buldak Original</h2>
-                <div class="food-options">
-                    <div class="option-group">
-                        <label>Pilih Jenis:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="original-type" value="packaging" data-price="5" checked>
-                                Packaging (RM5)
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="original-type" value="masak" data-price="6">
-                                Dah Masak (RM6)
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="original-type" value="telur" data-price="7">
-                                Dengan Telur (RM7)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-group">
-                        <label>Pilih Kaedah Pembayaran:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="original-payment" value="cash" checked>
-                                Tunai
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="original-payment" value="transfer">
-                                Transfer Bank
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-group">
-                        <label>Pilih Kaedah Penghantaran:</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="original-delivery" value="delivery" checked>
-                                Penghantaran
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="original-delivery" value="pickup">
-                                Ambil Sendiri (K240)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="location-input" id="original-location">
-                        <input type="text" placeholder="Masukkan No. Bilik" id="original-room">
-                    </div>
-
-                    <div class="quantity-control">
-                        <button class="quantity-btn minus" onclick="orderManager.updateQuantity('original', -1)">-</button>
-                        <span class="quantity-display" id="original-quantity">1</span>
-                        <button class="quantity-btn plus" onclick="orderManager.updateQuantity('original', 1)">+</button>
-                    </div>
-                    <div class="total-price" id="original-total">Total: RM5</div>
-                    <button class="cart-btn" onclick="orderManager.processOrder('original')">Order Sekarang</button>
-                </div>
+            <div class="option-group">
+              <label>Pilih Kaedah Pembayaran:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-payment"
+                    value="cash"
+                    checked
+                  />
+                  Tunai
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-payment"
+                    value="transfer"
+                  />
+                  Transfer Bank
+                </label>
+              </div>
             </div>
+
+            <!-- For both Carbonara and Original products -->
+            <div class="option-group">
+              <label>Pilih Kaedah Penghantaran:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-delivery"
+                    value="delivery"
+                    checked
+                  />
+                  Penghantaran
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-delivery"
+                    value="delivery-sutera"
+                  />
+                  Penghantaran Kolej Sutera (+RM1/item)
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="carbonara-delivery"
+                    value="pickup"
+                  />
+                  Ambil Sendiri (K240)
+                </label>
+              </div>
+              <div
+                class="delivery-note"
+                style="
+                  font-size: 0.85rem;
+                  color: #666;
+                  margin-top: 0.5rem;
+                  padding-left: 0.5rem;
+                  border-left: 2px solid #ff4d4d;
+                "
+              >
+                * Penghantaran ke Kolej Sutera dikenakan caj tambahan RM1 untuk
+                setiap item
+              </div>
+            </div>
+
+            <div class="location-input" id="carbonara-location">
+              <input
+                type="text"
+                placeholder="Masukkan No. Bilik"
+                id="carbonara-room"
+              />
+            </div>
+
+            <div class="quantity-control">
+              <button
+                class="quantity-btn minus"
+                onclick="orderManager.updateQuantity('carbonara', -1)"
+              >
+                -
+              </button>
+              <span class="quantity-display" id="carbonara-quantity">1</span>
+              <button
+                class="quantity-btn plus"
+                onclick="orderManager.updateQuantity('carbonara', 1)"
+              >
+                +
+              </button>
+            </div>
+            <div class="total-price" id="carbonara-total">Total: RM6</div>
+            <button
+              class="cart-btn"
+              onclick="orderManager.processOrder('carbonara')"
+            >
+              Order Sekarang
+            </button>
+          </div>
         </div>
 
+        <!-- Original Product Card -->
+        <div class="product-card">
+          <img
+            src="images/original.png"
+            alt="Buldak Original"
+            class="product-image"
+          />
+          <h2>Buldak Original</h2>
+          <div class="food-options">
+            <div class="option-group">
+              <label>Pilih Jenis:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-type"
+                    value="packaging"
+                    data-price="5"
+                    checked
+                  />
+                  Packaging (RM5)
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-type"
+                    value="masak"
+                    data-price="6"
+                  />
+                  Dah Masak (RM6)
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-type"
+                    value="telur"
+                    data-price="7"
+                  />
+                  Dengan Telur (RM7)
+                </label>
+              </div>
+            </div>
 
-        <div class="benefits">
-            <h2>Kenapa Pilih Kami?</h2>
-            <ul>
-                <li>Penghantaran Laju ke Kolej Kasa</li>
-                <li>Rasa yang Sedap dan Berkualiti</li>
-                <li>Khidmat Pelanggan yang Mesra</li>
-                <li>Maklum Balas Pesanan yang Pantas</li>
-                <li>Servis Penghantaran Eksklusif dalam Kolej</li>
-            </ul>
+            <div class="option-group">
+              <label>Pilih Kaedah Pembayaran:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-payment"
+                    value="cash"
+                    checked
+                  />
+                  Tunai
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-payment"
+                    value="transfer"
+                  />
+                  Transfer Bank
+                </label>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <label>Pilih Kaedah Penghantaran:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-delivery"
+                    value="delivery"
+                    checked
+                  />
+                  Penghantaran
+                </label>
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    name="original-delivery"
+                    value="delivery-sutera"
+                  />
+                  Penghantaran Kolej Sutera (+RM1/item)
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="original-delivery" value="pickup" />
+                  Ambil Sendiri (K240)
+                </label>
+              </div>
+              <div
+              class="delivery-note"
+              style="
+                font-size: 0.85rem;
+                color: #666;
+                margin-top: 0.5rem;
+                padding-left: 0.5rem;
+                border-left: 2px solid #ff4d4d;
+              "
+            >
+              * Penghantaran ke Kolej Sutera dikenakan caj tambahan RM1 untuk
+              setiap item
+            </div>
+            </div>
+
+            <div class="location-input" id="original-location">
+              <input
+                type="text"
+                placeholder="Masukkan No. Bilik"
+                id="original-room"
+              />
+            </div>
+
+            <div class="quantity-control">
+              <button
+                class="quantity-btn minus"
+                onclick="orderManager.updateQuantity('original', -1)"
+              >
+                -
+              </button>
+              <span class="quantity-display" id="original-quantity">1</span>
+              <button
+                class="quantity-btn plus"
+                onclick="orderManager.updateQuantity('original', 1)"
+              >
+                +
+              </button>
+            </div>
+            <div class="total-price" id="original-total">Total: RM5</div>
+            <button
+              class="cart-btn"
+              onclick="orderManager.processOrder('original')"
+            >
+              Order Sekarang
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div class="benefits">
+        <h2>Kenapa Pilih Kami?</h2>
+        <ul>
+          <li>Penghantaran Laju ke Kolej Kasa dan Sutera</li>
+          <li>Rasa yang Sedap dan Berkualiti</li>
+          <li>Khidmat Pelanggan yang Mesra</li>
+          <li>Maklum Balas Pesanan yang Pantas</li>
+          <li>Servis Penghantaran Eksklusif dalam Kolej</li>
+        </ul>
+      </div>
     </div>
 
     <footer>
-        <p>&copy; 2024 Website by hazimdev. All rights reserved.</p>
-        <p><a href="https://t.me/+1bFt1Jr3GFs3ZGM1" target="_blank">Join HazimDev Community</a></p>
+      <p>&copy; 2024 Website by hazimdev. All rights reserved.</p>
+      <p>
+        <a href="https://t.me/+1bFt1Jr3GFs3ZGM1" target="_blank"
+          >Join HazimDev Community</a
+        >
+      </p>
     </footer>
 
     <a href="https://wa.link/sqjot9" class="floating-whatsapp">
-        <i class="fab fa-whatsapp"></i>
+      <i class="fab fa-whatsapp"></i>
     </a>
 
     <script src="js/orderManagement.js"></script>
-</body>
+  </body>
 </html>

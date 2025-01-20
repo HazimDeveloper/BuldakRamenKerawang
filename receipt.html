@@ -138,86 +138,111 @@
     <script>
         // Get order data from URL parameters
         function getOrderData() {
-            const params = new URLSearchParams(window.location.search);
-            const orderData = params.get('data');
-            return orderData ? JSON.parse(decodeURIComponent(orderData)) : null;
-        }
+    const params = new URLSearchParams(window.location.search);
+    const orderData = params.get('data');
+    try {
+        const decoded = decodeURIComponent(orderData);
+        const parsed = JSON.parse(decoded);
+        return parsed;
+    } catch (error) {
+        console.error('Error parsing order data:', error);
+        return null;
+    }
+}
 
         // Generate receipt HTML
-        function generateReceipt(order) {
+        function generateReceipt(orders) {
+    // Ensure orders is an array
+    const orderArray = Array.isArray(orders) ? orders : [orders];
+    
+    let totalAmount = 0;
+    let itemsHtml = '';
 
-            const baseTotal = (order.basePrice * order.quantity).toFixed(2);
-    const deliveryFeeText = order.deliveryFee > 0 ? `<p><strong>Delivery Fee:</strong> RM${order.deliveryFee.toFixed(2)}</p>` : '';
+    // Generate HTML for each item
+    orderArray.forEach(order => {
+        const baseTotal = (order.basePrice * order.quantity).toFixed(2);
+        const deliveryFee = order.deliveryFeePerItem || 0;
+        const itemTotal = parseFloat(order.total.replace('RM', ''));
+        totalAmount += itemTotal;
 
-    return `
-        <div class="receipt" style="
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 400px;
-            margin: 20px auto;
-            font-family: 'Courier New', monospace;
-        ">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #ff4d4d;">Buldak Ramen UITM KT</h2>
-                <p>Order ID: ${order.orderId}</p>
-                <p>${new Date().toLocaleString()}</p>
-            </div>
-            <hr style="border: 1px dashed #ccc; margin: 10px 0;">
-            <div style="margin: 15px 0;">
+        itemsHtml += `
+            <div style="border-bottom: 1px dashed #ccc; padding: 10px 0;">
                 <p><strong>Product:</strong> ${order.product}</p>
                 <p><strong>Type:</strong> ${order.type}</p>
                 <p><strong>Quantity:</strong> ${order.quantity}</p>
                 <p><strong>Price per Item:</strong> RM${order.basePrice}</p>
                 <p><strong>Subtotal:</strong> RM${baseTotal}</p>
-                ${deliveryFeeText}
-                <p><strong>Payment Method:</strong> ${order.payment}</p>
-                <p><strong>Delivery Method:</strong> ${order.delivery}</p>
-                <p><strong>Room Number:</strong> ${order.roomNumber}</p>
+                ${deliveryFee > 0 ? `<p><strong>Delivery Fee:</strong> RM${deliveryFee.toFixed(2)} × ${order.quantity} = RM${(deliveryFee * order.quantity).toFixed(2)}</p>` : ''}
+                <p><strong>Item Total:</strong> ${order.total}</p>
             </div>
-            <hr style="border: 1px dashed #ccc; margin: 10px 0;">
-            <div style="text-align: right; margin-top: 10px;">
-                <h3>Total: ${order.total}</h3>
+        `;
+    });
+
+    // Common details (using first order for shared information)
+    const firstOrder = orderArray[0];
+    const orderId = firstOrder.orderId || 'ORD-' + Date.now();
+
+    return `
+        <div class="receipt">
+            <div class="receipt-header">
+                <h1>Buldak Ramen UITM KT</h1>
+                <p>Order ID: ${orderId}</p>
+                <p>${new Date().toLocaleString()}</p>
             </div>
-            <div style="text-align: center; margin-top: 20px; font-size: 0.8em;">
+            
+            <div class="divider"></div>
+            
+            <div class="receipt-details">
+                ${itemsHtml}
+            </div>
+            
+            <div class="divider"></div>
+
+            <div class="delivery-info">
+                <p><strong>Payment Method:</strong> ${firstOrder.payment}</p>
+                <p><strong>Delivery Method:</strong> ${firstOrder.delivery}</p>
+                <p><strong>Room Number:</strong> ${firstOrder.roomNumber}</p>
+            </div>
+
+            <div class="divider"></div>
+            
+            <div class="total">
+                <h3>Grand Total: RM${totalAmount.toFixed(2)}</h3>
+            </div>
+            
+            <div class="receipt-footer">
                 <p>Thank you for your order!</p>
                 <p>Please screenshot this receipt.</p>
             </div>
-        </div>`;
-        }
+        </div>
+    `;
+}
 
         // Complete order and close window
 // Update the completeOrder function in receipt.html
 function completeOrder() {
-    const order = getOrderData();
-    if (order) {
-        // Save completion to localStorage
-        const orders = JSON.parse(localStorage.getItem('buldakOrders') || '[]');
-        const updatedOrders = orders.map(o => {
-            if (o.orderId === order.orderId) {
-                return { ...o, status: 'completed' };
-            }
-            return o;
-        });
-        localStorage.setItem('buldakOrders', JSON.stringify(updatedOrders));
+    const orders = getOrderData();
+    if (orders) {
+        // Convert to array if single order
+        const orderArray = Array.isArray(orders) ? orders : [orders];
         
         // Notify admin via WhatsApp
         const adminPhone = "601169591087";
-        const message = encodeURIComponent(`
-🆕 New Order Received!
+        let message = "🆕 New Order(s) Received!\n\n";
+        
+        orderArray.forEach((order, index) => {
+            message += `Order ${index + 1}:\n`;
+            message += `Product: ${order.product}\n`;
+            message += `Type: ${order.type}\n`;
+            message += `Quantity: ${order.quantity}\n`;
+            message += `Total: ${order.total}\n`;
+            message += `Delivery: ${order.delivery}\n`;
+            message += `Room: ${order.roomNumber}\n\n`;
+        });
 
-Order ID: ${order.orderId}
-Product: ${order.product}
-Type: ${order.type}
-Quantity: ${order.quantity}
-${order.total}
-Payment: ${order.payment}
-Delivery: ${order.delivery}
-Room: ${order.roomNumber}
-Time: ${new Date().toLocaleString()}`);
+        message += `Time: ${new Date().toLocaleString()}`;
 
-        window.open(`https://wa.me/${adminPhone}?text=${message}`, '_blank');
+        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
 
         // Redirect back to main page
         window.location.href = 'index.html';
@@ -226,13 +251,13 @@ Time: ${new Date().toLocaleString()}`);
 
         // Initialize receipt
         window.onload = function() {
-            const order = getOrderData();
-            if (order) {
-                document.getElementById('receipt').innerHTML = generateReceipt(order);
-            } else {
-                document.getElementById('receipt').innerHTML = '<p>No order data found.</p>';
-            }
-        };
+    const orderData = getOrderData();
+    if (orderData) {
+        document.getElementById('receipt').innerHTML = generateReceipt(orderData);
+    } else {
+        document.getElementById('receipt').innerHTML = '<p>No order data found.</p>';
+    }
+};
     </script>
 </body>
 </html>

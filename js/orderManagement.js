@@ -1,9 +1,173 @@
 class OrderManagement {
     constructor() {
         this.orders = JSON.parse(localStorage.getItem('buldakOrders')) || [];
+        this.cart = JSON.parse(localStorage.getItem('buldakCart')) || [];
         this.adminPhone = "601169591087";
-        this.GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4u_T5jzYk2L2r6Gyjgx8BQDDARgSkcdo-TLYrQ8bNSYTwqsWDKSzCEBJdEGwVLn1bKA/exec';
+        this.GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL';
         this.initializeEventListeners();
+        this.updateCartCount();
+    }
+
+    async addToCart(product) {
+        const orderButton = document.querySelector(`button[onclick="orderManager.addToCart('${product}')"]`);
+        
+        try {
+            // Show loading state
+            if (orderButton) {
+                orderButton.innerText = 'Adding to Cart...';
+                orderButton.disabled = true;
+            }
+    
+            const quantity = parseInt(document.getElementById(`${product}-quantity`).textContent);
+            const type = document.querySelector(`input[name="${product}-type"]:checked`).value;
+            const payment = document.querySelector(`input[name="${product}-payment"]:checked`).value;
+            const delivery = document.querySelector(`input[name="${product}-delivery"]:checked`).value;
+            const roomNumber = document.getElementById(`${product}-room`).value;
+    
+            if (delivery.includes('delivery') && !roomNumber) {
+                alert('Sila masukkan nombor bilik!');
+                return;
+            }
+    
+            const priceDetails = this.updateTotal(product);
+    
+            const cartItem = {
+                id: Date.now(),
+                product: product.charAt(0).toUpperCase() + product.slice(1),
+                type,
+                quantity,
+                basePrice: priceDetails.basePrice,
+                deliveryFeePerItem: priceDetails.deliveryFeePerItem,
+                total: priceDetails.total,
+                payment,
+                delivery,
+                roomNumber: roomNumber || 'K240'
+            };
+    
+            this.cart.push(cartItem);
+            localStorage.setItem('buldakCart', JSON.stringify(this.cart));
+            this.updateCartCount();
+            this.showCartNotification();
+    
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Error adding item to cart. Please try again.');
+        } finally {
+            // Reset button state
+            if (orderButton) {
+                orderButton.innerText = 'Add to Cart';
+                orderButton.disabled = false;
+            }
+        }
+    }
+
+    updateCartCount() {
+        const cartCount = document.querySelector('.cart-count');
+        cartCount.textContent = this.cart.length;
+    }
+
+    showCart() {
+        const modal = document.getElementById('cartModal');
+        const cartItems = document.querySelector('.cart-items');
+        const cartTotal = document.querySelector('.cart-total h3');
+        
+        cartItems.innerHTML = '';
+        let total = 0;
+
+        this.cart.forEach(item => {
+            const itemTotal = parseFloat(item.total.replace('RM', ''));
+            total += itemTotal;
+
+            cartItems.innerHTML += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.product} - ${item.type}</h4>
+                        <p>Quantity: ${item.quantity}</p>
+                        <p>Delivery: ${item.delivery}</p>
+                        <p>Total: ${item.total}</p>
+                    </div>
+                    <div class="cart-item-remove" onclick="orderManager.removeFromCart(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+            `;
+        });
+
+        cartTotal.textContent = `Total: RM${total.toFixed(2)}`;
+        modal.style.display = 'block';
+
+        // Close modal when clicking outside
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        };
+
+        // Close button functionality
+        document.querySelector('.close').onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+
+    removeFromCart(itemId) {
+        this.cart = this.cart.filter(item => item.id !== itemId);
+        localStorage.setItem('buldakCart', JSON.stringify(this.cart));
+        this.updateCartCount();
+        this.showCart(); // Refresh cart display
+    }
+
+    clearCart() {
+        this.cart = [];
+        localStorage.setItem('buldakCart', JSON.stringify(this.cart));
+        this.updateCartCount();
+        this.showCart();
+    }
+
+    async checkoutCart() {
+        if (this.cart.length === 0) {
+            alert('Cart is empty!');
+            return;
+        }
+    
+        try {
+            // Save all orders at once
+            const savedOrders = [];
+            for (const item of this.cart) {
+                const savedOrder = await this.saveOrder(item);
+                savedOrders.push(savedOrder);
+            }
+    
+            // Show single receipt with all items
+            await this.showReceipt(savedOrders);
+            
+            // Clear cart after successful checkout
+            this.clearCart();
+            document.getElementById('cartModal').style.display = 'none';
+    
+        } catch (error) {
+            console.error('Error during checkout:', error);
+            alert('Error processing checkout. Please try again.');
+        }
+    }
+
+    showCartNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'cart-notification';
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 80px;
+                background: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            ">
+                Item added to cart!
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
     }
 
     initializeEventListeners() {

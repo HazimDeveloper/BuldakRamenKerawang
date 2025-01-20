@@ -3,7 +3,7 @@ class OrderManagement {
         this.orders = JSON.parse(localStorage.getItem('buldakOrders')) || [];
         this.cart = JSON.parse(localStorage.getItem('buldakCart')) || [];
         this.adminPhone = "601169591087";
-        this.GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL';
+        this.GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmwZILjJgcabqxdS0cP6bpV3s6C-CXW7LBDU2vCMDqJ9FKGBOf3LZwYhtNu-TJgOJ2Pg/exec';
         this.initializeEventListeners();
         this.updateCartCount();
     }

@@ -238,6 +238,7 @@ function completeOrder() {
             message += `Total: ${order.total}\n`;
             message += `Delivery: ${order.delivery}\n`;
             message += `Room: ${order.roomNumber}\n\n`;
+            message += `PaymentType: ${order.payment}\n\n`;
         });
 
         message += `Time: ${new Date().toLocaleString()}`;
